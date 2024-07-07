@@ -1,8 +1,8 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const helmet = require('helmet')
 const compression = require('compression')
-require('dotenv').config()
 
 const app = express()
 
@@ -10,14 +10,13 @@ const app = express()
 app.use(morgan('dev'))
 app.use(helmet())
 app.use(compression())
+app.use(express.json())
+app.use(express.urlencoded({ extends: true }))
 // init db
-require('./dbs/init.mongodb.lv0')
+require('./dbs/init.mongodb')
 
 // init routes
-app.get('/', (req, res, next) => {
-  res.status(200).json({ msg: 'Welcome to nodej' })
-})
-
+app.use('/', require('./routes/index'))
 // hanlding error
 
 module.exports = app
