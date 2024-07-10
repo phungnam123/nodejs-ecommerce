@@ -57,7 +57,8 @@ class AccessService {
           publicKey,
           privateKey
         )
-        console.log('Create token success:::', tokens)
+
+        console.log('Create tokens success:::', tokens)
 
         return {
           code: 201,
