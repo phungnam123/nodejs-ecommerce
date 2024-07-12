@@ -1,10 +1,10 @@
 @url_dev = http://localhost:8000/v1/api
 POST {{url_dev}}/shop/signup
 Content-Type: application/json
-x-api-key: asasasas
+x-api-key: a51f59b04e3f448c95f7b5f06a8360d798a3052173ea61f0b3a96e69179f538440278ed269c3523372cae17aed2f01776a93b98b88a0df3c02e0704b96a0d905
 
 {
   "name": "namms10",
-  "email": "phungtuannam40@gmail.com",
+  "email": "phungtuannam6@gmail.com",
   "password": "12345678"
 }
