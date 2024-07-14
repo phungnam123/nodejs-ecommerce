@@ -6,9 +6,11 @@ const keyTokenService = require('./keyToken.service')
 const { createTokenPair } = require('../auth/authUtils')
 const { getInfoData } = require('../utils')
 const {
-  BadRequestError,
-  ConflictRequestError,
+  ConflictError,
+  ForbiddenError,
+  AuthFailureError,
 } = require('../core/error.response')
+const { findByEmail } = require('./shop.service')
 
 const RoleShop = {
   SHOP: 'SHOP',
@@ -17,11 +19,46 @@ const RoleShop = {
   ADMIN: 'ADMIN',
 }
 class AccessService {
+  static login = async ({ email, password, refreshToken = null }) => {
+    // check email in dbs
+    const foundShop = await findByEmail({ email })
+    if (!foundShop) {
+      throw new ForbiddenError('Shop not register')
+    }
+    //check password
+    const matchPass = await bcrypt.compare(password, foundShop.password)
+    if (!matchPass) throw new AuthFailureError('Authentication error!')
+    //create AT and RT and save
+    const privateKey = crypto.randomBytes(64).toString('hex')
+    const publicKey = crypto.randomBytes(64).toString('hex')
+    //generate tokens
+    const tokens = await createTokenPair(
+      { userId: foundShop._id, email },
+      publicKey,
+      privateKey
+    )
+
+    await keyTokenService.createKeyToken({
+      refreshToken: tokens.refreshToken,
+      privateKey,
+      publicKey,
+    })
+
+    //get data
+    return {
+      shop: getInfoData({
+        fiels: ['_id', 'name', 'email'],
+        object: foundShop,
+      }),
+      tokens,
+    }
+  }
+
   static signup = async ({ name, email, password }) => {
     const holderShop = await shopModel.findOne({ email }).lean()
 
     if (holderShop) {
-      throw new BadRequestError('Shop already register!')
+      throw new ForbiddenError('Shop already register!')
     }
 
     const hashPassword = await bcrypt.hash(password, 10)
@@ -58,22 +95,13 @@ class AccessService {
         privateKey
       )
 
-      console.log('Create tokens success:::', tokens)
-
       return {
-        code: 201,
-        metadata: {
-          shop: getInfoData({
-            fiels: ['_id', 'name', 'email'],
-            object: newShop,
-          }),
-          tokens,
-        },
+        shop: getInfoData({
+          fiels: ['_id', 'name', 'email'],
+          object: newShop,
+        }),
+        tokens,
       }
-    }
-    return {
-      code: 201,
-      metada: null,
     }
   }
 }

@@ -5,6 +5,17 @@ x-api-key: a51f59b04e3f448c95f7b5f06a8360d798a3052173ea61f0b3a96e69179f538440278
 
 {
   "name": "namms10",
-  "email": "phungtuannam6@gmail.com",
+  "email": "phungtuannam09@gmail.com",
+  "password": "12345678"
+}
+
+### 
+
+POST {{url_dev}}/shop/login
+Content-Type: application/json
+x-api-key: a51f59b04e3f448c95f7b5f06a8360d798a3052173ea61f0b3a96e69179f538440278ed269c3523372cae17aed2f01776a93b98b88a0df3c02e0704b96a0d905
+
+{
+  "email": "phungtuannam09@gmail.com",
   "password": "12345678"
 }
